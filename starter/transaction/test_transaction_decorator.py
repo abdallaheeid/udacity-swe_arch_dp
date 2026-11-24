@@ -54,8 +54,15 @@ class TestFeeDecorator(unittest.TestCase):
 class TestDecoratorComposition(unittest.TestCase):
 
     def test_decorators_can_be_stacked(self):
-        t = FeeDecorator(TaxDecorator(Transaction(1000, INCOME), rate=0.2), fee=5)
-        self.assertAlmostEqual(t.amount, 800)          # fee doesn't apply to income
+        t = FeeDecorator(
+            TaxDecorator(
+                Transaction(
+                    1000,
+                    INCOME),
+                rate=0.2),
+            fee=5)
+        # fee doesn't apply to income
+        self.assertAlmostEqual(t.amount, 800)
 
         t = FeeDecorator(FeeDecorator(Transaction(100, EXPENSE), fee=1), fee=2)
         self.assertAlmostEqual(t.amount, 103)
@@ -77,8 +84,18 @@ class TestDecoratorWithBalance(unittest.TestCase):
         self.balance.reset()
 
     def test_balance_uses_decorated_amounts(self):
-        self.balance.apply_transaction(TaxDecorator(Transaction(1000, INCOME), rate=0.2))
-        self.balance.apply_transaction(FeeDecorator(Transaction(100, EXPENSE), fee=5))
+        self.balance.apply_transaction(
+            TaxDecorator(
+                Transaction(
+                    1000,
+                    INCOME),
+                rate=0.2))
+        self.balance.apply_transaction(
+            FeeDecorator(
+                Transaction(
+                    100,
+                    EXPENSE),
+                fee=5))
         self.assertAlmostEqual(self.balance.get_balance(), 695)   # 800 - 105
 
     def test_observers_see_decorated_amounts(self):
@@ -86,7 +103,8 @@ class TestDecoratorWithBalance(unittest.TestCase):
         self.balance.register_observer(observer)
         self.balance.apply_transaction(Transaction(100, INCOME))
         self.assertFalse(observer.alert_triggered)
-        self.balance.apply_transaction(FeeDecorator(Transaction(0, EXPENSE), fee=1))
+        self.balance.apply_transaction(
+            FeeDecorator(Transaction(0, EXPENSE), fee=1))
         self.assertTrue(observer.alert_triggered)               # 100 - 1 = 99
 
 

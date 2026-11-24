@@ -1,4 +1,5 @@
-"""Decorator pattern: add behaviour (tax, fees, ...) to transactions without modifying them."""
+"""Decorator pattern: add behaviour (tax, fees, ...) to transactions
+without modifying them."""
 from transaction.transaction import Transaction
 from transaction.transaction_category import TransactionCategory
 
@@ -7,7 +8,8 @@ class TransactionDecorator(Transaction):
     """Base decorator. Wraps a Transaction and exposes the same interface."""
 
     def __init__(self, transaction: Transaction):
-        # intentionally no super().__init__(): state comes from the wrapped transaction
+        # Intentionally no super().__init__():
+        # state comes from the wrapped transaction.
         self._wrapped = transaction
 
     @property
@@ -23,11 +25,16 @@ class TransactionDecorator(Transaction):
 
 
 class TaxDecorator(TransactionDecorator):
-    """Deducts a percentage tax from INCOME transactions. Expenses pass through unchanged."""
+    """Deducts a percentage tax from INCOME transactions.
+
+    Expenses pass through unchanged.
+    """
 
     def __init__(self, transaction: Transaction, rate: float):
         if not 0 <= rate <= 1:
-            raise ValueError(f"Tax rate must be between 0 and 1, got {rate}")
+            raise ValueError(
+                f"Tax rate must be between 0 and 1, got {rate}"
+            )
         super().__init__(transaction)
         self.rate = rate
 
@@ -39,11 +46,17 @@ class TaxDecorator(TransactionDecorator):
         return base
 
     def __str__(self):
-        return f"{self._wrapped} (after {self.rate:.0%} tax: {self.amount:.2f})"
+        return (
+            f"{self._wrapped} "
+            f"(after {self.rate:.0%} tax: {self.amount:.2f})"
+        )
 
 
 class FeeDecorator(TransactionDecorator):
-    """Adds a fixed fee to EXPENSE transactions. Income passes through unchanged."""
+    """Adds a fixed fee to EXPENSE transactions.
+
+    Income passes through unchanged.
+    """
 
     def __init__(self, transaction: Transaction, fee: float):
         if fee < 0:
@@ -59,4 +72,7 @@ class FeeDecorator(TransactionDecorator):
         return base
 
     def __str__(self):
-        return f"{self._wrapped} (+ fee {self.fee:.2f} = {self.amount:.2f})"
+        return (
+            f"{self._wrapped} "
+            f"(+ fee {self.fee:.2f} = {self.amount:.2f})"
+        )

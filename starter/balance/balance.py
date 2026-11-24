@@ -2,11 +2,12 @@
 
 from transaction.transaction_category import TransactionCategory
 
+
 class Balance:
     """Singleton to track the balance."""
 
     _instance = None
-    
+
     def __new__(cls):
         if cls._instance is None:
             print("No instance exists yet")
@@ -29,7 +30,7 @@ class Balance:
         """Reset the net balance to zero."""
         self.balance = 0
         self._observers.clear()
-        
+
     def add_income(self, amount):
         """Add income to the balance."""
         if amount < 0:
@@ -54,7 +55,9 @@ class Balance:
         elif transaction.category == TransactionCategory.EXPENSE:
             self.add_expense(transaction.amount)
         else:
-            raise ValueError(f"Unknown transaction category: {transaction.category}")
+            raise ValueError(
+                f"Unknown transaction category: {
+                    transaction.category}")
         self.notify(transaction)
 
     def get_balance(self):
@@ -63,17 +66,17 @@ class Balance:
 
     def summary(self) -> str:
         return f"Net balance: {self.balance:.2f}"
-    
+
     def register_observer(self, observer):
         self._observers.append(observer)
-        
+
     def deregister_observer(self, observer):
         self._observers.remove(observer)
-        
+
     def notify(self, transaction):
         for observer in self._observers:
             observer.update(self.balance, transaction)
-    
+
     @classmethod
     def get_instance(cls) -> "Balance":
         return cls()
